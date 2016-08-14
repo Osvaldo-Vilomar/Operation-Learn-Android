@@ -1,0 +1,66 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.vilomar.ozzie.udacityprojectportfolio.MainActivityFragment"
+    tools:showIn="@layout/activity_main">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|top">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:text="@string/main_screen_title"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal|top"
+            android:paddingTop="20dp" />
+
+        <Button
+            android:text="@string/main_first_button"
+            android:id="@+id/popular_Movies_Btn"
+            android:onClick="popularMoviesClick"
+            style="@style/MainButtonsStyle" />
+
+        <Button
+            android:text="@string/main_second_button"
+            android:id="@+id/stock_Hawk_Btn"
+            android:onClick="stockHawkClick"
+            style="@style/MainButtonsStyle" />
+
+        <Button
+            android:text="@string/main_third_button"
+            android:id="@+id/build_It_Bigger_Btn"
+            android:onClick="buildItBiggerClick"
+            style="@style/MainButtonsStyle" />
+
+        <Button
+            android:text="@string/main_fourth_button"
+            android:id="@+id/make_Your_App_Material_Btn"
+            android:onClick="makeYourAppMaterialClick"
+            style="@style/MainButtonsStyle" />
+
+        <Button
+            android:text="@string/main_fifth_button"
+            android:id="@+id/go_Ubiquitous_Btn"
+            android:onClick="goUbiquitousClick"
+            style="@style/MainButtonsStyle" />
+
+        <Button
+            android:text="@string/main_sixth_button"
+            android:id="@+id/capstone_Btn"
+            android:onClick="capstoneClick"
+            style="@style/MainButtonsStyle" />
+
+    </LinearLayout>
+
+</FrameLayout>

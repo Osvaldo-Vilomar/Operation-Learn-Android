@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Udacity Projects</string>
+    <string name="title_activity_movies">Movies</string>
+    <string name="title_activity_movie_details">Movie Details</string>
+    <string name="title_activity_read_reviews">Reviews</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- Menu label to fetch updated weather info from the server -->
+    <string name="action_refresh" translatable="false">Refresh</string>
+    <string name="title_activity_detail">Details</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="main_screen_title">My Udacity Nanodegree Apps!</string>
+    <string name="main_first_button">POPULAR MOVIES</string>
+    <string name="main_second_button">STOCK HAWK</string>
+    <string name="main_third_button">BUILD IT BIGGER</string>
+    <string name="main_fourth_button">MAKE YOUR APP MATERIAL</string>
+    <string name="main_fifth_button">GO UBIQUITOUS</string>
+    <string name="main_sixth_button">CAPSTONE</string>
+
+    <string name="pref_orderOfMovies_default">most_popular</string>
+    <string name="pref_orderOfMovies_key">order_of_movies</string>
+
+    <string name="pref_order_label_MostPopular">Most Popular</string>
+    <string name="pref_order_label_TopRated">Top Rated</string>
+    <string name="pref_order_label_Favorites">Favorites</string>
+    <string name="pref_order_label_OrderOfMovies">Order Of Movies</string>
+
+    <string name="pref_order_value_MostPopular">most_popular</string>
+    <string name="pref_order_value_TopRated">top_rated</string>
+    <string name="pref_order_value_Favorites">favorites</string>
+
+    <string name="movie_review">Movie Reviews</string>
+
+</resources>
