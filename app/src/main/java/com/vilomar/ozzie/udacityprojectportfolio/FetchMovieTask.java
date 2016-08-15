@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract;
 
@@ -29,11 +30,18 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-    private final Context mContext;
+    private Context mContext;
+    private ArrayAdapter<String> trailerAdapter;
+    private String[] trailerKeys = new String[5];
 
 
     public FetchMovieTask(Context context) {
         mContext = context;
+    }
+
+    public FetchMovieTask(Context context, ArrayAdapter<String> trailerAdapter) {
+        mContext = context;
+        this.trailerAdapter = trailerAdapter;
     }
 
     private String[] getMovieDataFromJson(String movieJsonStr, String apiCallParam) throws JSONException {
@@ -41,7 +49,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         String[] moviePosterLinks = new String[20];
 
         //Maximum of five trailer links
-        String[] trailerLinks = new String[5];
+        String[] trailerNames = new String[5];
 
         Uri contractEntryColumnUri = null;
 
@@ -155,16 +163,20 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
                 } else if(apiCallParam.equals("trailer")) {
 
-                    movieTrailer = movieDetail.getString(OWM_MOVIE_TRAILER);
-                    movieTrailerName = movieDetail.getString(OWM_MOVIE_TRAILER_NAME);
+                    if(i < 5) {
 
-                    Log.v(LOG_TAG, "Movie Trailer: " + movieTrailer);
+                        movieTrailer = movieDetail.getString(OWM_MOVIE_TRAILER);
+                        movieTrailerName = movieDetail.getString(OWM_MOVIE_TRAILER_NAME);
 
-                    movieValues.put(MovieContract.MostPopularEntry.COLUMN_TRAILER_LINK, movieTrailer);
-                    movieValues.put(MovieContract.MostPopularEntry.COLUMN_TRAILER_NAME, movieTrailerName);
+                        Log.v(LOG_TAG, "Movie Trailer: " + movieTrailer);
 
-                    trailerLinks[i] = movieTrailer;
+                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_TRAILER_LINK, movieTrailer);
+                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_TRAILER_NAME, movieTrailerName);
 
+
+                        trailerKeys[i] = movieTrailer;
+                        trailerNames[i] = movieTrailerName;
+                    }
                 } else if(apiCallParam.equals("review")) {
 
                     movieReviewAuthor = movieDetail.getString(OWM_MOVIE_REVIEW_AUTHOR);
@@ -188,10 +200,15 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
             Log.d(LOG_TAG, "FetchMovieTask Complete. " + inserted + " Inserted");
 
+            if(apiCallParam.equals("trailer")) {
+                return trailerNames;
+            }
+
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -307,4 +324,19 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
+    @Override
+    protected void onPostExecute(String[] result) {
+        if (result != null && trailerAdapter != null) {
+            trailerAdapter.clear();
+            for(String trailerStr : result) {
+                if(trailerStr != null && trailerStr != "") {
+                    trailerAdapter.add(trailerStr);
+                }
+            }
+        }
+    }
+
+    public String[] getTrailerKeys() {
+        return trailerKeys;
+    }
 }

@@ -53,6 +53,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vilomar.ozzie.udacityprojectportfolio.Movies" />
         </activity>
+        <activity
+            android:name=".MovieReviews"
+            android:label="@string/title_activity_read_reviews"
+            android:parentActivityName=".MovieDetails"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vilomar.ozzie.udacityprojectportfolio.MovieDetails" />
+        </activity>
     </application>
 
 </manifest>

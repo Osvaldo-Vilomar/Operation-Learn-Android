@@ -2,6 +2,8 @@ package com.vilomar.ozzie.udacityprojectportfolio;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Movie;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,12 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,6 +33,11 @@ import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract;
 public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = MovieDetailsFragment.class.getSimpleName();
+    private MovieAdapter posterAdapter;
+    private ArrayAdapter<String> trailerAdapter;
+    ListView movieDetailList;
+    ListView movieTrailerList;
+    TextView movieReviews;
 
     private static final int DETAIL_LOADER = 0;
     View rootView;
@@ -65,7 +77,33 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         // finally change the color
         window.setStatusBarColor(getActivity().getResources().getColor(R.color.colorBlack));
 
+        posterAdapter = new MovieAdapter(getActivity(), null, 0);
+        posterAdapter.setViewType("plot_synopsis");
+
+        trailerAdapter = new ArrayAdapter<String>(
+                getActivity(),
+                R.layout.list_item_trailer,
+                R.id.list_movie_trailer,
+                new ArrayList<String>()
+        );
+
         rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
+
+        movieDetailList = (ListView) rootView.findViewById(R.id.movieDetailsList);
+        movieDetailList.setAdapter(posterAdapter);
+
+        movieTrailerList = (ListView) rootView.findViewById(R.id.movieTrailerList);
+        movieTrailerList.setAdapter(trailerAdapter);
+
+        movieReviews = (TextView) rootView.findViewById(R.id.read_reviews);
+
+        movieReviews.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), MovieReviews.class);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
@@ -101,7 +139,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        String title = null;
+        final String[] trailerKeys;
 
         if(data != null && data.moveToFirst()) {
 
@@ -117,24 +155,24 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             ((TextView) getView().findViewById(R.id.detail_movie_rating))
                     .setText(data.getString(COL_VOTE_AVERAGE) + " / 10");
 
-            ((TextView) getView().findViewById(R.id.detail_movie_synopsis))
-                    .setText(data.getString(COL_PLOT_SYNOPSIS));
+            final FetchMovieTask movieTask = new FetchMovieTask(getActivity(), trailerAdapter);
+            movieTask.execute("trailer", data.getString(COL_MOVIE_ID));
 
-//            trailerAdapter = new ArrayAdapter<String>(
-//                    getActivity(),
-//                    R.layout.list_item_movie_detail,
-//                    R.id.list_item_trailer_textview,
-//                    new ArrayList<String>()
-//            );
+            trailerKeys = movieTask.getTrailerKeys();
 
-//            Log.v(LOG_TAG, "Onloadfinished, MOVIE ID: " + data.getString(COL_MOVIE_ID));
+            movieTrailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-//            FetchMovieTask movieTask = new FetchMovieTask(getActivity(), trailerAdapter);
-//            movieTask.execute("trailer", data.getString(COL_MOVIE_ID));
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-//            ListView trailerList = (ListView) getView().findViewById(R.id.listview_movieTrailer);
-//            trailerList.setAdapter(trailerAdapter);
+                    Uri webpage = Uri.parse("https://www.youtube.com/watch?v=" + trailerKeys[position]);
+                    Log.v(LOG_TAG, "WEB PAGE: " + webpage);
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
+                    startActivity(webIntent);
+                }
+            });
 
+            posterAdapter.swapCursor(data);
         }
     }
 

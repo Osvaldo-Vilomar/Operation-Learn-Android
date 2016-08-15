@@ -36,7 +36,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String[] MOST_POPULAR_COLUMNS = {
             MovieContract.MostPopularEntry._ID,
             MovieContract.MostPopularEntry.COLUMN_IMAGE_PATH,
-            MovieContract.MostPopularEntry.COLUMN_MOVIE_ID,
+            MovieContract.MostPopularEntry.COLUMN_MOVIE_ID
     };
     private static final String[] TOP_RATED_COLUMNS = {
             MovieContract.TopRatedEntry._ID,
@@ -86,6 +86,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
 
         moviesAdapter = new MovieAdapter(getActivity(), null, 0);
+        moviesAdapter.setViewType("movie_posters");
 
         View rootView = inflater.inflate(R.layout.fragment_movies, container, false);
 
