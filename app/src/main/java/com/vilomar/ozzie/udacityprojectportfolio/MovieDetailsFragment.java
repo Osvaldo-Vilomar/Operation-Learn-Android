@@ -95,16 +95,6 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         movieTrailerList = (ListView) rootView.findViewById(R.id.movieTrailerList);
         movieTrailerList.setAdapter(trailerAdapter);
 
-        movieReviews = (TextView) rootView.findViewById(R.id.read_reviews);
-
-        movieReviews.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MovieReviews.class);
-                startActivity(intent);
-            }
-        });
-
         return rootView;
     }
 
@@ -136,15 +126,19 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         );
     }
 
+    String[] trailerKeys;
+    String movieId;
+    String movieTitle;
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        final String[] trailerKeys;
-
         if(data != null && data.moveToFirst()) {
 
+            movieId = data.getString(COL_MOVIE_ID);
+            movieTitle = data.getString(COL_TITLE);
+
             ((TextView) getView().findViewById(R.id.detail_movie_title)).
-                    setText(data.getString(COL_TITLE));
+                    setText(movieTitle);
 
             Picasso.with(getContext()).load("http://image.tmdb.org/t/p/w500/" + data.getString(COL_IMAGE_PATH)).into((ImageView) getView()
                     .findViewById(R.id.detail_movie_poster));
@@ -155,8 +149,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             ((TextView) getView().findViewById(R.id.detail_movie_rating))
                     .setText(data.getString(COL_VOTE_AVERAGE) + " / 10");
 
-            final FetchMovieTask movieTask = new FetchMovieTask(getActivity(), trailerAdapter);
-            movieTask.execute("trailer", data.getString(COL_MOVIE_ID));
+            FetchMovieTask movieTask = new FetchMovieTask(getActivity(), trailerAdapter);
+            movieTask.execute("trailer", movieId);
 
             trailerKeys = movieTask.getTrailerKeys();
 
@@ -169,6 +163,19 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                     Log.v(LOG_TAG, "WEB PAGE: " + webpage);
                     Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
                     startActivity(webIntent);
+                }
+            });
+
+            movieReviews = (TextView) rootView.findViewById(R.id.read_reviews);
+            movieReviews.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Log.v(LOG_TAG, movieTitle);
+                    Intent intent = new Intent(getActivity(), MovieReviews.class).
+                            putExtra(Intent.EXTRA_TEXT, movieTitle).
+                            putExtra("movieId", movieId);
+                    startActivity(intent);
                 }
             });
 

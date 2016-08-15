@@ -31,17 +31,18 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
     private Context mContext;
-    private ArrayAdapter<String> trailerAdapter;
+    private ArrayAdapter<String> movieAdapter;
     private String[] trailerKeys = new String[5];
+    private ReviewContent[] reviewContent;
 
 
     public FetchMovieTask(Context context) {
         mContext = context;
     }
 
-    public FetchMovieTask(Context context, ArrayAdapter<String> trailerAdapter) {
+    public FetchMovieTask(Context context, ArrayAdapter<String> movieAdapter) {
         mContext = context;
-        this.trailerAdapter = trailerAdapter;
+        this.movieAdapter = movieAdapter;
     }
 
     private String[] getMovieDataFromJson(String movieJsonStr, String apiCallParam) throws JSONException {
@@ -182,9 +183,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                     movieReviewAuthor = movieDetail.getString(OWM_MOVIE_REVIEW_AUTHOR);
                     movieReviewItself = movieDetail.getString(OWM_MOVIE_REVIEW_ITSELF);
 
+                   
+
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_AUTHOR, movieReviewAuthor);
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_TEXT, movieReviewItself);
-
                 } else {
                     //Nothing to do?
                 }
@@ -326,11 +328,11 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected void onPostExecute(String[] result) {
-        if (result != null && trailerAdapter != null) {
-            trailerAdapter.clear();
+        if (result != null && movieAdapter != null) {
+            movieAdapter.clear();
             for(String trailerStr : result) {
                 if(trailerStr != null && trailerStr != "") {
-                    trailerAdapter.add(trailerStr);
+                    movieAdapter.add(trailerStr);
                 }
             }
         }
