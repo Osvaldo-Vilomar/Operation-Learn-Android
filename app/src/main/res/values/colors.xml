@@ -10,5 +10,6 @@
     <color name="colorDetailMoviesTeal">#26A69A</color>
     <color name="colorMainButtonText">#DD2C00</color>
     <color name="colorMovieTitle">#DD2C00</color>
+    <color name="colorMovieReview">#757575</color>
     <color name="colorPlotText">#FBE9E7</color>
 </resources>

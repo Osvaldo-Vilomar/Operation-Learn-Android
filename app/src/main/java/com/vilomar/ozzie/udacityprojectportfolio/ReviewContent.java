@@ -12,4 +12,11 @@ public class ReviewContent {
         this.list_movie_synopsis = list_movie_synopsis;
         this.list_movie_author = list_movie_author;
     }
+
+    public String setMovieSynopsis(String list_movie_synopsis) {
+        return this.list_movie_synopsis = list_movie_synopsis;
+    }
+    public String setMovieAuthor(String list_movie_author) {
+        return this.list_movie_author = list_movie_author;
+    }
 }

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ReviewContentAdapter extends ArrayAdapter<ReviewContent> {
     private static final String LOG_TAG = ReviewContentAdapter.class.getSimpleName();
@@ -23,7 +23,7 @@ public class ReviewContentAdapter extends ArrayAdapter<ReviewContent> {
      * @param context        The current context. Used to inflate the layout file.
      * @param androidFlavors A List of AndroidFlavor objects to display in a list
      */
-    public ReviewContentAdapter(Activity context, List<ReviewContent> androidFlavors) {
+    public ReviewContentAdapter(Activity context, ArrayList<ReviewContent> androidFlavors) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
         // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
@@ -43,7 +43,7 @@ public class ReviewContentAdapter extends ArrayAdapter<ReviewContent> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Gets the AndroidFlavor object from the ArrayAdapter at the appropriate position
-        ReviewContent androidFlavor = getItem(position);
+        ReviewContent reviewContent = getItem(position);
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
@@ -54,10 +54,10 @@ public class ReviewContentAdapter extends ArrayAdapter<ReviewContent> {
         }
 
         TextView reviewSynopsisView = (TextView) convertView.findViewById(R.id.list_movie_review_synopsis);
-        reviewSynopsisView.setText(androidFlavor.list_movie_synopsis);
+        reviewSynopsisView.setText(reviewContent.list_movie_synopsis);
 
         TextView reviewAuthorView = (TextView) convertView.findViewById(R.id.list_movie_review_author);
-        reviewAuthorView.setText(androidFlavor.list_movie_author);
+        reviewAuthorView.setText(reviewContent.list_movie_author);
 
         return convertView;
     }

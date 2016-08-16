@@ -10,11 +10,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/list_movie_review_synopsis" />
+        android:id="@+id/list_movie_review_synopsis"
+        android:paddingTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="20dp"
+        android:paddingRight="5dp"
+        android:textSize="15sp"
+        android:textColor="@color/colorWhite"
+        android:background="@color/colorMovieReview"
+        android:layout_marginTop="15dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="5dp"
+        android:textSize="15sp"
         android:text="New Text"
-        android:id="@+id/list_movie_review_author" />
+        android:id="@+id/list_movie_review_author"
+        android:background="@color/colorDetailMoviesTeal"
+        android:textColor="@color/colorWhite"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
 </LinearLayout>

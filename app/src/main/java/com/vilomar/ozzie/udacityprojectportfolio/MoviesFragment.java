@@ -81,9 +81,12 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         return super.onOptionsItemSelected(item);
     }
 
+    String orderOfMovies;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        orderOfMovies = Utility.getPreferredOrderOfMovies(getActivity());
 
         moviesAdapter = new MovieAdapter(getActivity(), null, 0);
         moviesAdapter.setViewType("movie_posters");
@@ -104,7 +107,6 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
                 Log.v(LOG_TAG, "Cursor: " + cursor.getString(COL_IMAGE_PATH));
                 if (cursor != null) {
-                    String orderOfMovies = Utility.getPreferredOrderOfMovies(getActivity());
 
                     if(orderOfMovies.equals("most_popular")) {
 
@@ -155,8 +157,8 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        Log.v(LOG_TAG, "onCreateLoader: ");
         String movieOrder = Utility.getPreferredOrderOfMovies(getActivity());
+        Log.v(LOG_TAG, "onCreateLoader, movie order: " + movieOrder);
         Uri movieUri;
 
         if(movieOrder.equals("most_popular")) {
@@ -199,6 +201,17 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
         moviesAdapter.swapCursor(cursor);
         //updateMovies();
+    }
+
+    void onOrderOfMoviesChanged( ) {
+        updateMovies();
+        getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
+    }
+
+    private void updateMovies() {
+        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+        String orderOfMovies = Utility.getPreferredOrderOfMovies(getActivity());
+        movieTask.execute(orderOfMovies);
     }
 
     @Override

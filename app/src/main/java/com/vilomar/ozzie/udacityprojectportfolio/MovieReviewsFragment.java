@@ -1,18 +1,19 @@
 package com.vilomar.ozzie.udacityprojectportfolio;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -20,9 +21,11 @@ import java.util.Arrays;
  */
 public class MovieReviewsFragment extends Fragment {
 
+    private static final String LOG_TAG = MovieReviewsFragment.class.getSimpleName();
+
     TextView movieTitleTV;
     View rootView;
-    private ArrayAdapter reviewAdapter;
+    private ReviewContentAdapter reviewAdapter;
 
     public MovieReviewsFragment() {
     }
@@ -42,7 +45,7 @@ public class MovieReviewsFragment extends Fragment {
         // finally change the color
         window.setStatusBarColor(getActivity().getResources().getColor(R.color.colorBlack));
 
-        reviewAdapter = new ReviewContentAdapter(getActivity(), null);
+        reviewAdapter = new ReviewContentAdapter(getActivity(), new ArrayList<ReviewContent>());
 
         rootView = inflater.inflate(R.layout.fragment_movie_reviews, container, false);
 
@@ -52,9 +55,17 @@ public class MovieReviewsFragment extends Fragment {
         movieTitleTV = (TextView)rootView.findViewById(R.id.detail_movie_review_title);
         movieTitleTV.setText(getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT));
 
-        FetchMovieTask movieTask = new FetchMovieTask(getActivity(), reviewAdapter);
-        movieTask.execute("review", getActivity().getIntent().getStringExtra("movieId"));
-
         return rootView;
+    }
+
+    private void updateMovieReview() {
+        FetchMovieTask movieTask = new FetchMovieTask(getActivity(), reviewAdapter, "ArrayAdapter<ReviewContent>");
+        movieTask.execute("review", getActivity().getIntent().getStringExtra("movieId"));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateMovieReview();
     }
 }

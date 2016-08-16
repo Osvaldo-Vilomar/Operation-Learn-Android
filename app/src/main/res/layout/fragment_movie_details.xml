@@ -46,8 +46,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Read Reviews"
                 android:id="@+id/read_reviews"
-                android:paddingTop="10dp"
-                android:textColor="@color/colorBlack"/>
+                android:layout_marginTop="10dp"
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorDetailMoviesTeal"
+                android:padding="5dp" />
 
         </LinearLayout>
 

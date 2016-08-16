@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -32,9 +33,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
     private Context mContext;
     private ArrayAdapter<String> movieAdapter;
+    private ArrayAdapter<ReviewContent> reviewAdapter;
     private String[] trailerKeys = new String[5];
-    private ReviewContent[] reviewContent;
-
+    private boolean asyncStatusFinished = false;
+    private ArrayList<ReviewContent> reviewContentArrayList = new ArrayList<>();
 
     public FetchMovieTask(Context context) {
         mContext = context;
@@ -43,6 +45,11 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
     public FetchMovieTask(Context context, ArrayAdapter<String> movieAdapter) {
         mContext = context;
         this.movieAdapter = movieAdapter;
+    }
+
+    public FetchMovieTask(Context context, ArrayAdapter<ReviewContent> reviewAdapter, String overrideToThis) {
+        mContext = context;
+        this.reviewAdapter = reviewAdapter;
     }
 
     private String[] getMovieDataFromJson(String movieJsonStr, String apiCallParam) throws JSONException {
@@ -73,7 +80,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             JSONArray movieArray = movieJson.getJSONArray(OWM_Result);
 
             Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
-
             for (int i = 0; i < movieArray.length(); i++) {
 
                 JSONObject movieDetail = movieArray.getJSONObject(i);
@@ -129,7 +135,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 //                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_AUTHOR, "");
 //                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_TEXT, "");
 
-                        // Finally, insert location data into the database.
                         Uri insertedUri = mContext.getContentResolver().insert(
                                 MovieContract.MostPopularEntry.CONTENT_URI,
                                 movieValues
@@ -162,6 +167,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                     movieValues.put(MovieContract.TopRatedEntry.COLUMN_VOTE_AVERAGE, voteAverage);
                     movieValues.put(MovieContract.TopRatedEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
 
+                    Log.v(LOG_TAG, "Image Path: " + imagePath);
+
                 } else if(apiCallParam.equals("trailer")) {
 
                     if(i < 5) {
@@ -183,7 +190,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                     movieReviewAuthor = movieDetail.getString(OWM_MOVIE_REVIEW_AUTHOR);
                     movieReviewItself = movieDetail.getString(OWM_MOVIE_REVIEW_ITSELF);
 
-                   
+                    if(reviewAdapter != null) {
+                        reviewContentArrayList.add(new ReviewContent(movieReviewItself, movieReviewAuthor));
+                    }
 
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_AUTHOR, movieReviewAuthor);
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_TEXT, movieReviewItself);
@@ -204,6 +213,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
             if(apiCallParam.equals("trailer")) {
                 return trailerNames;
+            }
+            else if(apiCallParam.equals("review")) {
+                return new String[] { "review" } ;
             }
 
         } catch (JSONException e) {
@@ -252,7 +264,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                         BuildConfig.OPEN_WEATHER_MAP_API_KEY;
                 appIdParam = "APPID";
             } else if (params[0].equals("review")) {
-                movieBaseUrl = "http://api.themoviedb.org/3/movie/209112/reviews?api_key=" +
+                movieBaseUrl = "http://api.themoviedb.org/3/movie/" + params[1] + "/reviews?api_key=" +
                         BuildConfig.OPEN_WEATHER_MAP_API_KEY;
                 appIdParam = "APPID";
             } else {
@@ -326,6 +338,14 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
+    public boolean getAsyncFinished() {
+        return asyncStatusFinished;
+    }
+
+    public void setAsyncFinished(boolean asyncStatusFinished) {
+        this.asyncStatusFinished = asyncStatusFinished;
+    }
+
     @Override
     protected void onPostExecute(String[] result) {
         if (result != null && movieAdapter != null) {
@@ -334,6 +354,12 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                 if(trailerStr != null && trailerStr != "") {
                     movieAdapter.add(trailerStr);
                 }
+            }
+        }
+        if(result != null && result[0].equals("review")) {
+            Log.v(LOG_TAG, "Review finished");
+            for(int i = 0; i < reviewContentArrayList.size(); i++) {
+                reviewAdapter.add(reviewContentArrayList.get(i));
             }
         }
     }
