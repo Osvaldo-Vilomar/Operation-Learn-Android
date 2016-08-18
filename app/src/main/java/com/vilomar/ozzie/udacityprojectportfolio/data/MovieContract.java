@@ -141,8 +141,8 @@ public class MovieContract {
             return CONTENT_URI.buildUpon().build();
         }
 
-        public static Uri buildMovieTopRatedWithOrder(String orderOfMovies) {
-            return CONTENT_URI.buildUpon().appendPath(orderOfMovies).build();
+        public static Uri buildMovieTopRatedDetail(String movieID) {
+            return CONTENT_URI.buildUpon().appendPath(movieID).build();
         }
 
         public static String getMovieTopRatedIDFromURI(Uri uri) {

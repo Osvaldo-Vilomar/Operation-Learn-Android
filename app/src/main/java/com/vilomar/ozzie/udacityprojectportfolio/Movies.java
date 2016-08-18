@@ -9,12 +9,20 @@ import android.view.MenuItem;
 
 public class Movies extends AppCompatActivity {
 
+    private final String MOVIEFRAGMENT_TAG = "MFTAG";
+
     private String mOrderOfMovies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.movies_container, new MoviesFragment(), MOVIEFRAGMENT_TAG)
+                    .commit();
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -38,5 +46,19 @@ public class Movies extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String orderOfMovies = Utility.getPreferredOrderOfMovies( this );
+        // update the location in our second pane using the fragment manager
+        if (orderOfMovies != null && !orderOfMovies.equals(mOrderOfMovies)) {
+            MoviesFragment mf = (MoviesFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+            if ( null != mf) {
+                mf.onOrderOfMoviesChanged();
+            }
+            mOrderOfMovies = orderOfMovies;
+        }
     }
 }

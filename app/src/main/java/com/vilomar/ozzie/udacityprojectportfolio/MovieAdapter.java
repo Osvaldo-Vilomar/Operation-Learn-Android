@@ -3,6 +3,7 @@ package com.vilomar.ozzie.udacityprojectportfolio;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,7 @@ public class MovieAdapter extends CursorAdapter {
 
         switch (viewType) {
             case VIEW_TYPE_MOVIES: {
+                Log.v(LOG_TAG, "Cursor: " + cursor.getString(MoviesFragment.COL_IMAGE_PATH));
                 Picasso.with(context).load("http://image.tmdb.org/t/p/w500/" + cursor
                         .getString(MoviesFragment.COL_IMAGE_PATH))
                         .resize(540, 810)
@@ -93,4 +95,5 @@ public class MovieAdapter extends CursorAdapter {
             }
         }
     }
+
 }

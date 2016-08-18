@@ -130,10 +130,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                         movieValues.put(MovieContract.MostPopularEntry.COLUMN_RELEASE_DATE, releaseDate);
                         movieValues.put(MovieContract.MostPopularEntry.COLUMN_VOTE_AVERAGE, voteAverage);
                         movieValues.put(MovieContract.MostPopularEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
-//                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_TRAILER_LINK, "");
-//                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_TRAILER_NAME, "");
-//                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_AUTHOR, "");
-//                        movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_TEXT, "");
 
                         Uri insertedUri = mContext.getContentResolver().insert(
                                 MovieContract.MostPopularEntry.CONTENT_URI,
@@ -148,7 +144,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
                     movieCursor.close();
 
-                    Log.v(LOG_TAG, "Image Path: " + imagePath);
                     Log.v(LOG_TAG, "Most Popular Row Id just inserted: " + movieMostPopularRowId);
 
                 } else if(apiCallParam.equals("top_rated")) {
@@ -160,14 +155,40 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                     voteAverage = movieDetail.getString(OWM_VOTE_AVERAGE);
                     plotSynopsis = movieDetail.getString(OWM_PLOT_SYNOPSIS);
 
-                    movieValues.put(MovieContract.TopRatedEntry.COLUMN_MOVIE_ID, movieID);
-                    movieValues.put(MovieContract.TopRatedEntry.COLUMN_TITLE, title);
-                    movieValues.put(MovieContract.TopRatedEntry.COLUMN_IMAGE_PATH, imagePath);
-                    movieValues.put(MovieContract.TopRatedEntry.COLUMN_RELEASE_DATE, releaseDate);
-                    movieValues.put(MovieContract.TopRatedEntry.COLUMN_VOTE_AVERAGE, voteAverage);
-                    movieValues.put(MovieContract.TopRatedEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
+                    Cursor movieCursor = mContext.getContentResolver().query(
+                            MovieContract.TopRatedEntry.CONTENT_URI,
+                            new String[]{MovieContract.TopRatedEntry._ID},
+                            MovieContract.TopRatedEntry.COLUMN_MOVIE_ID + " = ?",
+                            new String[]{movieID},
+                            null);
 
-                    Log.v(LOG_TAG, "Image Path: " + imagePath);
+                    long movieTopRatedRowId;
+
+                    if (movieCursor.moveToFirst()) {
+                        int movieIdIndex = movieCursor.getColumnIndex(MovieContract.TopRatedEntry._ID);
+                        movieTopRatedRowId = movieCursor.getLong(movieIdIndex);
+                    } else {
+
+                        movieValues.put(MovieContract.TopRatedEntry.COLUMN_MOVIE_ID, movieID);
+                        movieValues.put(MovieContract.TopRatedEntry.COLUMN_TITLE, title);
+                        movieValues.put(MovieContract.TopRatedEntry.COLUMN_IMAGE_PATH, imagePath);
+                        movieValues.put(MovieContract.TopRatedEntry.COLUMN_RELEASE_DATE, releaseDate);
+                        movieValues.put(MovieContract.TopRatedEntry.COLUMN_VOTE_AVERAGE, voteAverage);
+                        movieValues.put(MovieContract.TopRatedEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
+
+                        Uri insertedUri = mContext.getContentResolver().insert(
+                                MovieContract.TopRatedEntry.CONTENT_URI,
+                                movieValues
+                        );
+
+                        movieTopRatedRowId = ContentUris.parseId(insertedUri);
+
+                        moviePosterLinks[i] = "image=[" + imagePath + "]";
+                    }
+
+                    movieCursor.close();
+
+                    Log.v(LOG_TAG, "Most Popular Row Id just inserted: " + movieTopRatedRowId);
 
                 } else if(apiCallParam.equals("trailer")) {
 
@@ -196,6 +217,52 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_AUTHOR, movieReviewAuthor);
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_TEXT, movieReviewItself);
+
+                } else if(apiCallParam.equals("favorite")){
+
+                    movieID = movieDetail.getString(OWM_MOVIE_ID);
+                    title = movieDetail.getString(OWM_Title);
+                    imagePath = movieDetail.getString(OWM_Poster);
+                    releaseDate = movieDetail.getString(OWM_RELEASE_DATE);
+                    voteAverage = movieDetail.getString(OWM_VOTE_AVERAGE);
+                    plotSynopsis = movieDetail.getString(OWM_PLOT_SYNOPSIS);
+
+                    Cursor movieCursor = mContext.getContentResolver().query(
+                            MovieContract.FavoritesEntry.CONTENT_URI,
+                            new String[]{MovieContract.FavoritesEntry._ID},
+                            MovieContract.FavoritesEntry.COLUMN_MOVIE_ID + " = ?",
+                            new String[]{movieID},
+                            null);
+
+                    long movieFavoriteRowId;
+
+                    if (movieCursor.moveToFirst()) {
+                        int movieIdIndex = movieCursor.getColumnIndex(MovieContract.FavoritesEntry._ID);
+                        movieFavoriteRowId = movieCursor.getLong(movieIdIndex);
+                    } else {
+
+                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_MOVIE_ID, movieID);
+                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_TITLE, title);
+                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_IMAGE_PATH, imagePath);
+                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_RELEASE_DATE, releaseDate);
+                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_VOTE_AVERAGE, voteAverage);
+                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
+
+                        Uri insertedUri = mContext.getContentResolver().insert(
+                                MovieContract.FavoritesEntry.CONTENT_URI,
+                                movieValues
+                        );
+
+                        // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+                        movieFavoriteRowId = ContentUris.parseId(insertedUri);
+
+                        moviePosterLinks[i] = "image=[" + imagePath + "]";
+                    }
+
+                    movieCursor.close();
+
+                    Log.v(LOG_TAG, "Most Popular Row Id just inserted: " + movieFavoriteRowId);
+
                 } else {
                     //Nothing to do?
                 }
@@ -235,6 +302,16 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
         String apiCallParam = params[0];
 
+        if(params[0].equals("favorites")) {
+
+            try {
+                return getMovieDataFromJson("", apiCallParam);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+        }
+
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -257,8 +334,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                 movieBaseUrl = "http://api.themoviedb.org/3/movie/top_rated?api_key=" +
                         BuildConfig.OPEN_WEATHER_MAP_API_KEY;
                 appIdParam = "APPID";
-            } else if (params[0].equals("favorites")) {
-                //Here, what do we do? We return nothing, because we will not be making the api call.
             } else if (params[0].equals("trailer")) {
                 movieBaseUrl = "http://api.themoviedb.org/3/movie/" + params[1] + "/videos?api_key=" +
                         BuildConfig.OPEN_WEATHER_MAP_API_KEY;
@@ -336,14 +411,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         }
 
         return null;
-    }
-
-    public boolean getAsyncFinished() {
-        return asyncStatusFinished;
-    }
-
-    public void setAsyncFinished(boolean asyncStatusFinished) {
-        this.asyncStatusFinished = asyncStatusFinished;
     }
 
     @Override

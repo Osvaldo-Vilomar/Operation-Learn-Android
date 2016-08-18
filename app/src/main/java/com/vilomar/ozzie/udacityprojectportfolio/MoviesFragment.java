@@ -27,7 +27,6 @@ import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract;
  */
 public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-
     private final String LOG_TAG = MoviesFragment.class.getSimpleName();
 
     private MovieAdapter moviesAdapter;
@@ -75,7 +74,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            //updateMovies();
+            updateMovies();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -186,21 +185,13 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
                     null,
                     null);
         } else {
-            movieUri = MovieContract.MostPopularEntry.buildMovieMostPopular();
-            return new CursorLoader(getActivity(),
-                    movieUri,
-                    MOST_POPULAR_COLUMNS,
-                    null,
-                    null,
-                    null);
+            return null;
         }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-
         moviesAdapter.swapCursor(cursor);
-        //updateMovies();
     }
 
     void onOrderOfMoviesChanged( ) {

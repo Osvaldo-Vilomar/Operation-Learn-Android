@@ -30,7 +30,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + " (" +
                 FavoritesEntry._ID + " INTEGER PRIMARY KEY," +
                 FavoritesEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
-                FavoritesEntry.COLUMN_TITLE + " TEXT UNIQUE NOT NULL, " +
+                FavoritesEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_IMAGE_PATH + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL, " +

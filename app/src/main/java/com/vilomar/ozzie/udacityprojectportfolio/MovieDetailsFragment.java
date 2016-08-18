@@ -1,5 +1,6 @@
 package com.vilomar.ozzie.udacityprojectportfolio;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Movie;
@@ -20,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract;
@@ -38,6 +40,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     ListView movieDetailList;
     ListView movieTrailerList;
     TextView movieReviews;
+    TextView movieFavorite;
 
     private static final int DETAIL_LOADER = 0;
     View rootView;
@@ -176,6 +179,23 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                             putExtra(Intent.EXTRA_TEXT, movieTitle).
                             putExtra("movieId", movieId);
                     startActivity(intent);
+                }
+            });
+
+            movieFavorite = (TextView) rootView.findViewById(R.id.movie_favorite);
+            movieFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+                    movieTask.execute("favorite");
+
+                    Context context = getActivity();
+                    CharSequence text = "Movie added to Favorites";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
                 }
             });
 
