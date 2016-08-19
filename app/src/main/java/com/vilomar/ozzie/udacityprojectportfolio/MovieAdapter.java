@@ -82,7 +82,7 @@ public class MovieAdapter extends CursorAdapter {
 
         switch (viewType) {
             case VIEW_TYPE_MOVIES: {
-                Log.v(LOG_TAG, "Cursor: " + cursor.getString(MoviesFragment.COL_IMAGE_PATH));
+                Log.v(LOG_TAG, "Cursor: " + cursor);
                 Picasso.with(context).load("http://image.tmdb.org/t/p/w500/" + cursor
                         .getString(MoviesFragment.COL_IMAGE_PATH))
                         .resize(540, 810)

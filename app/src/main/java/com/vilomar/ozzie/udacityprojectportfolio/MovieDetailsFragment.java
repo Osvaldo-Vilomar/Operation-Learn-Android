@@ -3,7 +3,6 @@ package com.vilomar.ozzie.udacityprojectportfolio;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,7 +26,6 @@ import com.squareup.picasso.Picasso;
 import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -35,7 +33,7 @@ import java.util.List;
 public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = MovieDetailsFragment.class.getSimpleName();
-    private MovieAdapter posterAdapter;
+    private MovieAdapter plotAdapter;
     private ArrayAdapter<String> trailerAdapter;
     ListView movieDetailList;
     ListView movieTrailerList;
@@ -80,8 +78,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         // finally change the color
         window.setStatusBarColor(getActivity().getResources().getColor(R.color.colorBlack));
 
-        posterAdapter = new MovieAdapter(getActivity(), null, 0);
-        posterAdapter.setViewType("plot_synopsis");
+        plotAdapter = new MovieAdapter(getActivity(), null, 0);
+        plotAdapter.setViewType("plot_synopsis");
 
         trailerAdapter = new ArrayAdapter<String>(
                 getActivity(),
@@ -93,7 +91,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
         movieDetailList = (ListView) rootView.findViewById(R.id.movieDetailsList);
-        movieDetailList.setAdapter(posterAdapter);
+        movieDetailList.setAdapter(plotAdapter);
 
         movieTrailerList = (ListView) rootView.findViewById(R.id.movieTrailerList);
         movieTrailerList.setAdapter(trailerAdapter);
@@ -132,6 +130,10 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     String[] trailerKeys;
     String movieId;
     String movieTitle;
+    String imagePath;
+    String releaseDate;
+    String movieRating;
+    String plotSynopsis;
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
@@ -139,18 +141,22 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
             movieId = data.getString(COL_MOVIE_ID);
             movieTitle = data.getString(COL_TITLE);
+            imagePath = data.getString(COL_IMAGE_PATH);
+            releaseDate = data.getString(COL_RELEASE_DATE);
+            movieRating = data.getString(COL_VOTE_AVERAGE);
+            plotSynopsis = data.getString(COL_PLOT_SYNOPSIS);
 
             ((TextView) getView().findViewById(R.id.detail_movie_title)).
                     setText(movieTitle);
 
-            Picasso.with(getContext()).load("http://image.tmdb.org/t/p/w500/" + data.getString(COL_IMAGE_PATH)).into((ImageView) getView()
+            Picasso.with(getContext()).load("http://image.tmdb.org/t/p/w500/" + imagePath).into((ImageView) getView()
                     .findViewById(R.id.detail_movie_poster));
 
             ((TextView) getView().findViewById(R.id.detail_movie_release_date))
-                    .setText(data.getString(COL_RELEASE_DATE));
+                    .setText(releaseDate);
 
             ((TextView) getView().findViewById(R.id.detail_movie_rating))
-                    .setText(data.getString(COL_VOTE_AVERAGE) + " / 10");
+                    .setText(movieRating + " / 10");
 
             FetchMovieTask movieTask = new FetchMovieTask(getActivity(), trailerAdapter);
             movieTask.execute("trailer", movieId);
@@ -188,7 +194,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                 public void onClick(View v) {
 
                     FetchMovieTask movieTask = new FetchMovieTask(getActivity());
-                    movieTask.execute("favorite");
+                    movieTask.setFavoriteMovieVariables(movieId, movieTitle, imagePath, releaseDate, movieRating, plotSynopsis);
+                    movieTask.execute("favorites");
 
                     Context context = getActivity();
                     CharSequence text = "Movie added to Favorites";
@@ -199,7 +206,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                 }
             });
 
-            posterAdapter.swapCursor(data);
+            plotAdapter.swapCursor(data);
         }
     }
 

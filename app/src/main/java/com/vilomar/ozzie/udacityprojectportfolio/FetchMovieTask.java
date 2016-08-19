@@ -35,7 +35,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
     private ArrayAdapter<String> movieAdapter;
     private ArrayAdapter<ReviewContent> reviewAdapter;
     private String[] trailerKeys = new String[5];
-    private boolean asyncStatusFinished = false;
     private ArrayList<ReviewContent> reviewContentArrayList = new ArrayList<>();
 
     public FetchMovieTask(Context context) {
@@ -59,7 +58,13 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         //Maximum of five trailer links
         String[] trailerNames = new String[5];
 
-        Uri contractEntryColumnUri = null;
+        if(apiCallParam.equals("favorites")){
+
+            //delete rows inserted into db for debugging
+            //int rowsDeleted = mContext.getContentResolver().delete(MovieContract.FavoritesEntry.CONTENT_URI, null, null);
+            addToFavoriteDatabase();
+            return null;
+        }
 
         // These are the names of the JSON objects that need to be extracted.
         final String OWM_Result = "results";
@@ -84,20 +89,20 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
                 JSONObject movieDetail = movieArray.getJSONObject(i);
 
-                String movieID = null;
-                String title = null;
-                String imagePath = null;
-                String releaseDate = null;
-                String voteAverage = null;
-                String plotSynopsis = null;
+                String movieID;
+                String title;
+                String imagePath;
+                String releaseDate;
+                String voteAverage;
+                String plotSynopsis;
 
                 //Extract this when the apiCallParam is trailer
-                String movieTrailer = null;
-                String movieTrailerName = null;
+                String movieTrailer;
+                String movieTrailerName;
 
                 //Extract this when the apiCallParam is review
-                String movieReviewAuthor = null;
-                String movieReviewItself = null;
+                String movieReviewAuthor;
+                String movieReviewItself;
 
                 ContentValues movieValues = new ContentValues();
 
@@ -206,7 +211,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                         trailerKeys[i] = movieTrailer;
                         trailerNames[i] = movieTrailerName;
                     }
-                } else if(apiCallParam.equals("review")) {
+                } if(apiCallParam.equals("review")) {
 
                     movieReviewAuthor = movieDetail.getString(OWM_MOVIE_REVIEW_AUTHOR);
                     movieReviewItself = movieDetail.getString(OWM_MOVIE_REVIEW_ITSELF);
@@ -217,51 +222,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_AUTHOR, movieReviewAuthor);
                     movieValues.put(MovieContract.MostPopularEntry.COLUMN_REVIEW_TEXT, movieReviewItself);
-
-                } else if(apiCallParam.equals("favorite")){
-
-                    movieID = movieDetail.getString(OWM_MOVIE_ID);
-                    title = movieDetail.getString(OWM_Title);
-                    imagePath = movieDetail.getString(OWM_Poster);
-                    releaseDate = movieDetail.getString(OWM_RELEASE_DATE);
-                    voteAverage = movieDetail.getString(OWM_VOTE_AVERAGE);
-                    plotSynopsis = movieDetail.getString(OWM_PLOT_SYNOPSIS);
-
-                    Cursor movieCursor = mContext.getContentResolver().query(
-                            MovieContract.FavoritesEntry.CONTENT_URI,
-                            new String[]{MovieContract.FavoritesEntry._ID},
-                            MovieContract.FavoritesEntry.COLUMN_MOVIE_ID + " = ?",
-                            new String[]{movieID},
-                            null);
-
-                    long movieFavoriteRowId;
-
-                    if (movieCursor.moveToFirst()) {
-                        int movieIdIndex = movieCursor.getColumnIndex(MovieContract.FavoritesEntry._ID);
-                        movieFavoriteRowId = movieCursor.getLong(movieIdIndex);
-                    } else {
-
-                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_MOVIE_ID, movieID);
-                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_TITLE, title);
-                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_IMAGE_PATH, imagePath);
-                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_RELEASE_DATE, releaseDate);
-                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_VOTE_AVERAGE, voteAverage);
-                        movieValues.put(MovieContract.FavoritesEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
-
-                        Uri insertedUri = mContext.getContentResolver().insert(
-                                MovieContract.FavoritesEntry.CONTENT_URI,
-                                movieValues
-                        );
-
-                        // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
-                        movieFavoriteRowId = ContentUris.parseId(insertedUri);
-
-                        moviePosterLinks[i] = "image=[" + imagePath + "]";
-                    }
-
-                    movieCursor.close();
-
-                    Log.v(LOG_TAG, "Most Popular Row Id just inserted: " + movieFavoriteRowId);
 
                 } else {
                     //Nothing to do?
@@ -304,8 +264,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
         if(params[0].equals("favorites")) {
 
+            Log.v(LOG_TAG, "Plot Synopsis: " + plotSynopsis);
+
             try {
-                return getMovieDataFromJson("", apiCallParam);
+                return getMovieDataFromJson(null, apiCallParam);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -433,5 +395,43 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
     public String[] getTrailerKeys() {
         return trailerKeys;
+    }
+
+    String movieID;
+    String movieTitle;
+    String imagePath;
+    String releaseDate;
+    String movieRating;
+    String plotSynopsis;
+    public void setFavoriteMovieVariables(String movieID, String movieTitle, String imagePath, String releaseDate, String movieRating, String plotSynopsis) {
+        this.movieID = movieID;
+        this.movieTitle = movieTitle;
+        this.imagePath = imagePath;
+        this.releaseDate = releaseDate;
+        this.movieRating = movieRating;
+        this.plotSynopsis = plotSynopsis;
+    }
+
+    void addToFavoriteDatabase() {
+
+        Vector<ContentValues> cVVector = new Vector(5);
+        ContentValues movieValues = new ContentValues();
+
+        movieValues.put(MovieContract.FavoritesEntry.COLUMN_MOVIE_ID, movieID);
+        movieValues.put(MovieContract.FavoritesEntry.COLUMN_TITLE, movieTitle);
+        movieValues.put(MovieContract.FavoritesEntry.COLUMN_IMAGE_PATH, imagePath);
+        movieValues.put(MovieContract.FavoritesEntry.COLUMN_RELEASE_DATE, releaseDate);
+        movieValues.put(MovieContract.FavoritesEntry.COLUMN_VOTE_AVERAGE, movieRating);
+        movieValues.put(MovieContract.FavoritesEntry.COLUMN_PLOT_SYNOPSIS, plotSynopsis);
+
+        cVVector.add(movieValues);
+
+        int inserted = 0;
+        if (cVVector.size() > 0) {
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray(cvArray);
+            inserted = mContext.getContentResolver().bulkInsert(MovieContract.FavoritesEntry.CONTENT_URI, cvArray);
+        }
+        Log.v(LOG_TAG, "Favorites Row Id just inserted: " + inserted);
     }
 }

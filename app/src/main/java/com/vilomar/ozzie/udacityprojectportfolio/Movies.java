@@ -16,6 +16,7 @@ public class Movies extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mOrderOfMovies = Utility.getPreferredOrderOfMovies(this);
         setContentView(R.layout.activity_movies);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

@@ -16,7 +16,7 @@ import com.vilomar.ozzie.udacityprojectportfolio.data.MovieContract.TopRatedEntr
 public class MovieDBHelper extends SQLiteOpenHelper {
 
 // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "movies.db";
 
@@ -43,7 +43,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_MOST_POPULAR_TABLE = "CREATE TABLE " + MostPopularEntry.TABLE_NAME + " (" +
                 MostPopularEntry._ID + " INTEGER PRIMARY KEY," +
                 MostPopularEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
-                MostPopularEntry.COLUMN_TITLE + " TEXT UNIQUE NOT NULL, " +
+                MostPopularEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 MostPopularEntry.COLUMN_IMAGE_PATH + " TEXT NOT NULL, " +
                 MostPopularEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 MostPopularEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL, " +
@@ -56,7 +56,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_TOP_RATED_TABLE = "CREATE TABLE " + TopRatedEntry.TABLE_NAME + " (" +
                 TopRatedEntry._ID + " INTEGER PRIMARY KEY," +
                 TopRatedEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
-                TopRatedEntry.COLUMN_TITLE + " TEXT UNIQUE NOT NULL, " +
+                TopRatedEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 TopRatedEntry.COLUMN_IMAGE_PATH + " TEXT NOT NULL, " +
                 TopRatedEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 TopRatedEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL, " +

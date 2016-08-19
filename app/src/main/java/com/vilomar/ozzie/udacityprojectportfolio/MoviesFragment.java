@@ -191,6 +191,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        Log.v(LOG_TAG, "Cursor: " + cursor);
         moviesAdapter.swapCursor(cursor);
     }
 
