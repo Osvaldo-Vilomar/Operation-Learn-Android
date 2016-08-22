@@ -40,6 +40,9 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     TextView movieReviews;
     TextView movieFavorite;
 
+    static final String DETAIL_URI = "URI";
+    private Uri mUri;
+
     private static final int DETAIL_LOADER = 0;
     View rootView;
 
@@ -67,6 +70,12 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(MovieDetailsFragment.DETAIL_URI);
+        }
+
         Window window = getActivity().getWindow();
 
         // clear FLAG_TRANSLUCENT_STATUS flag:
@@ -105,28 +114,34 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         super.onActivityCreated(savedInstanceState);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        Log.v(LOG_TAG, "Intent: " + intent);
-        Log.v(LOG_TAG, "Intent Get Data: " + intent.getData());
-        if (intent == null) {
-            return null;
+    void onOrderOfMoviesChanged(String newOrderOfMovies) {
+        // replace the uri, since the location has changed
+        Uri uri = mUri;
+        if (null != uri) {
+            String movieId = MovieContract.MostPopularEntry.getMovieMostPopularIDFromURI(uri);
+            Uri updatedUri = MovieContract.FavoritesEntry.buildMovieFavoritesWithOrder(newOrderOfMovies, movieId);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(
-                getActivity(),
-                intent.getData(),
-                MOVIE_COLUMNS,
-                null,
-                null,
-                null
-        );
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        if (null != mUri) {
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+            return new CursorLoader(
+                    getActivity(),
+                    mUri,
+                    MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+        }
+        return null;
+    }
     String[] trailerKeys;
     String movieId;
     String movieTitle;

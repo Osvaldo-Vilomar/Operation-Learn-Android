@@ -21,11 +21,27 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <fragment
-        android:id="@+id/fragment_movies1"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.vilomar.ozzie.udacityprojectportfolio.MoviesFragment"
-        tools:layout="@android:layout/list_content"/>
+        android:layout_gravity="left|top">
+
+        <fragment
+            android:id="@+id/fragment_movies1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:name="com.vilomar.ozzie.udacityprojectportfolio.MoviesFragment"
+            tools:layout="@android:layout/list_content"/>
+
+        <FrameLayout
+            android:id="@+id/movie_detail_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4" />
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

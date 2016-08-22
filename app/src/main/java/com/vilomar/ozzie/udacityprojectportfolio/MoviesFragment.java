@@ -52,6 +52,18 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_IMAGE_PATH = 1;
     static final int COL_MOVIE_ID = 2;
 
+    /**
+      * A callback interface that all activities containing this fragment must
+      * implement. This mechanism allows activities to be notified of item
+      * selections.
+     */
+   public interface Callback {
+            /**
+              * DetailFragmentCallback for when an item has been selected.
+              */
+            public void onItemSelected(Uri dateUri);
+    }
+
     public MoviesFragment() {
     }
 
@@ -85,8 +97,6 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        orderOfMovies = Utility.getPreferredOrderOfMovies(getActivity());
-
         moviesAdapter = new MovieAdapter(getActivity(), null, 0);
         moviesAdapter.setViewType("movie_posters");
 
@@ -106,30 +116,20 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
                 Log.v(LOG_TAG, "Cursor: " + cursor.getString(COL_IMAGE_PATH));
                 if (cursor != null) {
-
+                    orderOfMovies = Utility.getPreferredOrderOfMovies(getActivity());
                     if(orderOfMovies.equals("most_popular")) {
-
-                        //Use Log.v to see the intent in details
-                        Intent intent = new Intent(getActivity(), MovieDetails.class)
-                                .setData(MovieContract.MostPopularEntry.
-                                        buildMovieMostPopularDetail(cursor.getString(COL_MOVIE_ID)));
+                        ((Callback) getActivity()).onItemSelected(MovieContract.MostPopularEntry
+                                .buildMovieMostPopularDetail(cursor.getString(COL_MOVIE_ID)));
                         Log.v(LOG_TAG, "Send this to Movie Details: " + MovieContract.MostPopularEntry.
                                 buildMovieMostPopularDetail(cursor.getString(COL_MOVIE_ID)));
-                        startActivity(intent);
                     } else if(orderOfMovies.equals("top_rated")) {
-
-                        //Use Log.v to see the intent in details
-                        Intent intent = new Intent(getActivity(), MovieDetails.class)
-                                .setData(MovieContract.TopRatedEntry.
-                                        buildMovieTopRated());
-                        startActivity(intent);
+                        ((Callback) getActivity()).onItemSelected(MovieContract.TopRatedEntry
+                                .buildMovieTopRatedDetail(cursor.getString(COL_MOVIE_ID)));
+                        Log.v(LOG_TAG, "Send this to Movie Details: " + MovieContract.TopRatedEntry.
+                                buildMovieTopRatedDetail(cursor.getString(COL_MOVIE_ID)));
                     } else if(orderOfMovies.equals("favorites")) {
-
-                        //Use Log.v to see the intent in details
-                        Intent intent = new Intent(getActivity(), MovieDetails.class)
-                                .setData(MovieContract.FavoritesEntry.
-                                        buildMovieFavorites());
-                        startActivity(intent);
+                        ((Callback) getActivity()).onItemSelected(MovieContract.FavoritesEntry
+                                .buildMovieFavorites());
                     }
                 }
             }
@@ -191,7 +191,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        Log.v(LOG_TAG, "Cursor: " + cursor);
+        Log.v(LOG_TAG, "Cursor onLoadFinished: " + cursor);
         moviesAdapter.swapCursor(cursor);
     }
 
@@ -203,6 +203,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     private void updateMovies() {
         FetchMovieTask movieTask = new FetchMovieTask(getActivity());
         String orderOfMovies = Utility.getPreferredOrderOfMovies(getActivity());
+        Log.v(LOG_TAG, "Order of Movies in updateMovies() method: " + orderOfMovies);
         movieTask.execute(orderOfMovies);
     }
 

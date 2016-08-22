@@ -245,9 +245,17 @@ public class MovieProvider extends ContentProvider {
             MovieContract.MostPopularEntry.COLUMN_PLOT_SYNOPSIS
     };
 
-    private String sMovieIDSelection =
-            MovieContract.MostPopularEntry.TABLE_NAME+
+    private String sMovieIDSelectionMostPopular =
+            MovieContract.MostPopularEntry.TABLE_NAME +
                     "." + MovieContract.MostPopularEntry.COLUMN_MOVIE_ID + " = ? ";
+
+    private String sMovieIDSelectionTopRated =
+            MovieContract.TopRatedEntry.TABLE_NAME +
+                    "." + MovieContract.TopRatedEntry.COLUMN_MOVIE_ID + " = ? ";
+
+    private String sMovieIDSelectionFavorite =
+            MovieContract.FavoritesEntry.TABLE_NAME +
+                    "." + MovieContract.FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -301,7 +309,7 @@ public class MovieProvider extends ContentProvider {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MostPopularEntry.TABLE_NAME,
                         MOVIE_COLUMNS,
-                        sMovieIDSelection,
+                        sMovieIDSelectionMostPopular,
                         new String[]{MovieContract.MostPopularEntry.getMovieMostPopularIDFromURI(uri)},
                         null,
                         null,
@@ -310,10 +318,10 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_TOP_RATED_DETAIL:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MostPopularEntry.TABLE_NAME,
+                        MovieContract.TopRatedEntry.TABLE_NAME,
                         MOVIE_COLUMNS,
-                        MovieContract.TopRatedEntry.getMovieTopRatedIDFromURI(uri),
-                        selectionArgs,
+                        sMovieIDSelectionTopRated,
+                        new String[]{MovieContract.TopRatedEntry.getMovieTopRatedIDFromURI(uri)},
                         null,
                         null,
                         sortOrder
@@ -321,10 +329,10 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_FAVORITE_DETAIL:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MostPopularEntry.TABLE_NAME,
+                        MovieContract.FavoritesEntry.TABLE_NAME,
                         MOVIE_COLUMNS,
-                        MovieContract.FavoritesEntry.getMovieFavoritesIDFromURI(uri),
-                        selectionArgs,
+                        sMovieIDSelectionFavorite,
+                        new String[]{MovieContract.FavoritesEntry.getMovieFavoritesIDFromURI(uri)},
                         null,
                         null,
                         sortOrder
