@@ -140,6 +140,16 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                     null
             );
         }
+        else if(getActivity().getIntent().getData() != null) {
+            return new CursorLoader(
+                    getActivity(),
+                    getActivity().getIntent().getData(),
+                    MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+        }
         return null;
     }
     String[] trailerKeys;
